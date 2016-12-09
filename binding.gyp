@@ -22,14 +22,10 @@
         [
           'OS!="win"', {
             "libraries" : [
-              '-lspotify'
+              '<!@(pkg-config libspotify --libs)'
             ],
-          }
-        ],
-        [
-          'OS=="win"', {
-            "libraries" : [
-              '<(module_root_dir)/gyp/lib/libspotify.dll.a'
+            "include_dirs": [
+              '<!@(pkg-config libspotify --cflags | sed s/-I//g)'
             ]
           }
         ]
