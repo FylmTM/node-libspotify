@@ -193,30 +193,6 @@ NAN_METHOD(Track_Is_Starred) {
   info.GetReturnValue().Set(Nan::New<Boolean>(starred));
 }
 
-NAN_METHOD(Track_Set_Starred) {
-
-
-  // test arguments sanity
-  assert(info.Length() == 3);
-  assert(info[0]->IsObject());
-  assert(info[1]->IsArray());
-  assert(info[2]->IsBoolean());
-
-  ObjectHandle<sp_session>* session = ObjectHandle<sp_session>::Unwrap(info[0]);
-
-  Local<Array> arr = info[1].As<Array>();
-  unsigned int length = arr->Length();
-  sp_track* tracks[length];
-  for(unsigned int i=0; i<length; ++i) {
-    tracks[i] = ObjectHandle<sp_track>::Unwrap(arr->Get(i))->pointer;
-  }
-
-  sp_error error = sp_track_set_starred(session->pointer, tracks, length, info[2]->ToBoolean()->BooleanValue());
-  NSP_THROW_IF_ERROR(error);
-
-  info.GetReturnValue().SetUndefined();
-}
-
 /**
  * JS track_popularity implementation. checks if a given track is loaded
  */
@@ -246,5 +222,4 @@ void nsp::init_track(Local<Object> target) {
   Nan::Export(target, "track_get_availability", Track_Get_Availability);
   Nan::Export(target, "track_is_starred", Track_Is_Starred);
   Nan::Export(target, "track_popularity", Track_Popularity);
-  Nan::Export(target, "track_set_starred", Track_Set_Starred);
 }

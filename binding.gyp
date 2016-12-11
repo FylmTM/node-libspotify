@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "target_name": "libspotify",
+      "target_name": "spotify",
       "sources": [
         "src/album.cc",
         "src/artist.cc",
@@ -26,9 +26,32 @@
             ],
             "include_dirs": [
               '<!@(pkg-config libspotify --cflags | sed s/-I//g)'
+            ]          }
+        ],
+        [
+          'OS=="win"', {
+            "libraries" : [
+              '-lC:/build/libspotify/lib/libspotify.lib'
+            ],
+            "include_dirs": [
+              'C:/build/libspotify/include'
             ]
           }
         ]
+      ]
+    },
+    {
+      'target_name': 'spotify-postbuild',
+      'dependencies': ['spotify'],
+      'conditions': [
+        ['OS=="win"', {
+          'copies': [{
+            'destination': '<(PRODUCT_DIR)',
+            'files': [
+              'C:/build/libspotify/lib/libspotify.dll'
+            ]
+          }]
+        }]
       ]
     }
   ]

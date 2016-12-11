@@ -27,7 +27,11 @@
 #ifndef _JUKEBOX_AUDIO_H_
 #define _JUKEBOX_AUDIO_H_
 
+#ifdef _WIN32
+#include "winpthread.h"
+#else
 #include <pthread.h>
+#endif
 #include <stdint.h>
 #include "queue.h"
 

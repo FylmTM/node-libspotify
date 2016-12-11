@@ -19,6 +19,11 @@
 #ifndef NSP_COMMON_H
 #define NSP_COMMON_H
 
+#ifdef _WIN32
+#define WINVER 0x0600
+#define _WIN32_WINNT 0x0600
+#endif
+
 #include <nan.h>
 #include <string.h>
 #include <libspotify/api.h>

@@ -19,7 +19,11 @@
 #include "common.h"
 #include "playlistcallbacks.cc"
 #include <stdlib.h>
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <unistd.h>
+#endif
 
 using namespace v8;
 using namespace nsp;
@@ -37,7 +41,7 @@ NAN_METHOD(nsp::JsNoOp) {
  * spotify callback for the logged_in event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_logged_in_callback(sp_session* session, sp_error error) {
+static SP_LIBEXPORT(void) call_logged_in_callback(sp_session* session, sp_error error) {
   ObjectHandle<sp_session>* s = (ObjectHandle<sp_session>*) sp_session_userdata(session);
   Local<Object> o = Nan::New(s->object);
   Local<Value> cbv = o->Get(Nan::GetCurrentContext(), Nan::New<String>("logged_in").ToLocalChecked()).ToLocalChecked();
@@ -61,7 +65,7 @@ static void call_logged_in_callback(sp_session* session, sp_error error) {
  * spotify callback for the logged_out event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_logged_out_callback(sp_session* session) {
+static SP_LIBEXPORT(void) call_logged_out_callback(sp_session* session) {
   ObjectHandle<sp_session>* s = (ObjectHandle<sp_session>*) sp_session_userdata(session);
   Local<Object> o = Nan::New(s->object);
   Local<Value> cbv = o->Get(Nan::GetCurrentContext(), Nan::New<String>("logged_out").ToLocalChecked()).ToLocalChecked();
@@ -70,9 +74,7 @@ static void call_logged_out_callback(sp_session* session) {
   }
   Nan::Callback *cb = new Nan::Callback(cbv.As<Function>());
 
-  const unsigned int argc = 0;
-  Local<Value> argv[argc] = {};
-  cb->Call(argc, argv);
+  cb->Call(0, 0);
 
   return;
 }
@@ -81,7 +83,7 @@ static void call_logged_out_callback(sp_session* session) {
  * spotify callback for the metadata_updated event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_metadata_updated_callback(sp_session* session) {
+static SP_LIBEXPORT(void) call_metadata_updated_callback(sp_session* session) {
   ObjectHandle<sp_session>* s = (ObjectHandle<sp_session>*) sp_session_userdata(session);
   Local<Object> o = Nan::New(s->object);
   Local<Value> cbv = o->Get(Nan::GetCurrentContext(), Nan::New<String>("metadata_updated").ToLocalChecked()).ToLocalChecked();
@@ -90,9 +92,7 @@ static void call_metadata_updated_callback(sp_session* session) {
   }
   Nan::Callback *cb = new Nan::Callback(cbv.As<Function>());
 
-  const unsigned int argc = 0;
-  Local<Value> argv[argc] = {};
-  cb->Call(argc, argv);
+  cb->Call(0, 0);
 
   return;
 }
@@ -101,14 +101,14 @@ static void call_metadata_updated_callback(sp_session* session) {
  * spotify callback for the connection_error event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_connection_error_callback(sp_session* session, sp_error error) {
+static SP_LIBEXPORT(void) call_connection_error_callback(sp_session* session, sp_error error) {
 }
 
 /**
  * spotify callback for the message_to_user event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_message_to_user_callback(sp_session* session, const char* message) {
+static SP_LIBEXPORT(void) call_message_to_user_callback(sp_session* session, const char* message) {
 }
 
 
@@ -118,7 +118,7 @@ uv_timer_t do_notify_handle; ///> uv loop handle for notifying main thread
  * since the notify_main_thread is not called from the main thread
  * we have to set a timer in order to execute the JS callback at the right moment
  */
-static void do_call_notify_main_thread_callback(sp_session* session) {
+static SP_LIBEXPORT(void) do_call_notify_main_thread_callback(sp_session* session) {
   ObjectHandle<sp_session>* s = (ObjectHandle<sp_session>*) sp_session_userdata(session);
   Local<Object> o = Nan::New(s->object);
   Local<Value> cbv = o->Get(Nan::GetCurrentContext(), Nan::New<String>("notify_main_thread").ToLocalChecked()).ToLocalChecked();
@@ -127,9 +127,7 @@ static void do_call_notify_main_thread_callback(sp_session* session) {
   }
   Nan::Callback *cb = new Nan::Callback(cbv.As<Function>());
 
-  const unsigned int argc = 0;
-  Local<Value> argv[argc] = {};
-  cb->Call(argc, argv);
+  cb->Call(0, 0);
 
   return;
 }
@@ -152,7 +150,12 @@ public:
 
  void Execute () {
   while (!notifysession && alive) {
+
+    #ifdef _WIN32
+    Sleep(1); //1ms
+    #else
     usleep(1e3); // 1ms
+    #endif
     continue;
   }
  }
@@ -172,7 +175,7 @@ protected:
  void HandleErrorCallback () {}
 };
 
-static void call_notify_main_thread_callback(sp_session* session) {
+static SP_LIBEXPORT(void) call_notify_main_thread_callback(sp_session* session) {
   // uv_timer_init(uv_default_loop(), &do_notify_handle);
   // do_notify_handle.data = session;
 
@@ -188,13 +191,13 @@ static void call_notify_main_thread_callback(sp_session* session) {
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  * implemented in player.cc
  */
-extern int call_music_delivery_callback(sp_session* session, const sp_audioformat *format, const void *frames, int num_frames);
+extern SP_LIBEXPORT(int) call_music_delivery_callback(sp_session* session, const sp_audioformat *format, const void *frames, int num_frames);
 
 /**
  * spotify callback for the play_token_lost event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_play_token_lost_callback(sp_session* session) {
+static SP_LIBEXPORT(void) call_play_token_lost_callback(sp_session* session) {
   ObjectHandle<sp_session>* s = (ObjectHandle<sp_session>*) sp_session_userdata(session);
   Local<Object> o = Nan::New(s->object);
   Local<Value> cbv = o->Get(Nan::GetCurrentContext(), Nan::New<String>("play_token_lost").ToLocalChecked()).ToLocalChecked();
@@ -203,9 +206,7 @@ static void call_play_token_lost_callback(sp_session* session) {
   }
   Nan::Callback *cb = new Nan::Callback(cbv.As<Function>());
 
-  const unsigned int argc = 0;
-  Local<Value> argv[argc] = {};
-  cb->Call(argc, argv);
+  cb->Call(0, 0);
 
   return;
 }
@@ -214,7 +215,7 @@ static void call_play_token_lost_callback(sp_session* session) {
  * spotify callback for the log_message event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_log_message_callback(sp_session* session, const char* data) {
+static SP_LIBEXPORT(void) call_log_message_callback(sp_session* session, const char* data) {
 }
 
 /**
@@ -222,83 +223,83 @@ static void call_log_message_callback(sp_session* session, const char* data) {
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  * implemented in player.cc
  */
-extern void call_end_of_track_callback(sp_session* session);
+extern SP_LIBEXPORT(void) call_end_of_track_callback(sp_session* session);
 
 /**
  * spotify callback for the streaming_error event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_streaming_error_callback(sp_session* session, sp_error error) {
+static SP_LIBEXPORT(void) call_streaming_error_callback(sp_session* session, sp_error error) {
 }
 
 /**
  * spotify callback for the userinfo_updated event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_userinfo_updated_callback(sp_session* session) {
+static SP_LIBEXPORT(void) call_userinfo_updated_callback(sp_session* session) {
 }
 
 /**
  * spotify callback for the start_playback event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_start_playback_callback(sp_session* session) {
+static SP_LIBEXPORT(void) call_start_playback_callback(sp_session* session) {
 }
 
 /**
  * spotify callback for the stop_playback event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_stop_playback_callback(sp_session* session) {
+static SP_LIBEXPORT(void) call_stop_playback_callback(sp_session* session) {
 }
 
 /**
  * spotify callback for the get_audio_buffer_stats event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_get_audio_buffer_stats_callback(sp_session* session, sp_audio_buffer_stats* stats) {
+static SP_LIBEXPORT(void) call_get_audio_buffer_stats_callback(sp_session* session, sp_audio_buffer_stats* stats) {
 }
 
 /**
  * spotify callback for the offline_status_updated event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_offline_status_updated_callback(sp_session* session) {
+static SP_LIBEXPORT(void) call_offline_status_updated_callback(sp_session* session) {
 }
 
 /**
  * spotify callback for the offline_error event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_offline_error_callback(sp_session* session, sp_error error) {
+static SP_LIBEXPORT(void) call_offline_error_callback(sp_session* session, sp_error error) {
 }
 
 /**
  * spotify callback for the credentials_blob_updated event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_credentials_blob_updated_callback(sp_session* session, const char* blob) {
+static SP_LIBEXPORT(void) call_credentials_blob_updated_callback(sp_session* session, const char* blob) {
 }
 
 /**
  * spotify callback for the connectionstate_updated event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_connectionstate_updated_callback(sp_session* session) {
+static SP_LIBEXPORT(void) call_connectionstate_updated_callback(sp_session* session) {
 }
 
 /**
  * spotify callback for the scrobble_error event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_scrobble_error_callback(sp_session* session, sp_error error) {
+static SP_LIBEXPORT(void) call_scrobble_error_callback(sp_session* session, sp_error error) {
 }
 
 /**
  * spotify callback for the private_session_mode_changed event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-static void call_private_session_mode_changed_callback(sp_session* session, bool is_private) {
+static SP_LIBEXPORT(void) call_private_session_mode_changed_callback(sp_session* session, bool is_private) {
 }
 
 static sp_session_callbacks spcallbacks = {

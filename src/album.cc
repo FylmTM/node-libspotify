@@ -126,7 +126,7 @@ NAN_METHOD(Album_Artist) {
  * It calls the passed JS function callback and passes the raw image data as
  * parameter as soon as the regarding image loading process has finished.
  */
-void cb_image_loaded_album(sp_image *image, void *userdata) {
+SP_LIBEXPORT(void) cb_image_loaded_album(sp_image *image, void *userdata) {
   Nan::Callback * callback = static_cast<Nan::Callback *>(userdata);
   size_t image_size;
   const void *image_data = sp_image_data(image, &image_size);

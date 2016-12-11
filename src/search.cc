@@ -25,7 +25,7 @@ using namespace nsp;
 /**
  * Spotify callback when a search query completed
  */
-static void on_search_complete(sp_search* result, void* userdata) {
+static SP_LIBEXPORT(void) on_search_complete(sp_search* result, void* userdata) {
   ObjectHandle<sp_search>* search = static_cast<ObjectHandle<sp_search>* >(userdata);
   Local<Value> cbv = Nan::New(search->object)->Get(Nan::GetCurrentContext(), Nan::New<String>("on_search_complete").ToLocalChecked()).ToLocalChecked();
   if(!cbv->IsFunction()) {

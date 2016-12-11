@@ -37,7 +37,7 @@ static bool workeralive = false;
  * sending the end_of_track event
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  */
-extern void call_end_of_track_callback(sp_session* session) {
+extern SP_LIBEXPORT(void) call_end_of_track_callback(sp_session* session) {
   ObjectHandle<sp_session>* s = (ObjectHandle<sp_session>*) sp_session_userdata(session);
   Local<Object> o = Nan::New(s->object);
   Local<Value> cbv = o->Get(Nan::GetCurrentContext(), Nan::New<String>("end_of_track").ToLocalChecked()).ToLocalChecked();
@@ -46,9 +46,7 @@ extern void call_end_of_track_callback(sp_session* session) {
   }
   Nan::Callback *cb = new Nan::Callback(cbv.As<Function>());
 
-  const unsigned int argc = 0;
-  Local<Value> argv[argc] = {};
-  cb->Call(argc, argv);
+  cb->Call(0, 0);
 }
 
 /**
@@ -56,7 +54,7 @@ extern void call_end_of_track_callback(sp_session* session) {
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__session__callbacks.html
  * In this, we are called from an internal spotify thread. We buffer the data in the audio_fifo structure
  */
-extern int call_music_delivery_callback(sp_session* session, const sp_audioformat *format, const void *frames, int num_frames) {
+extern SP_LIBEXPORT(int) call_music_delivery_callback(sp_session* session, const sp_audioformat *format, const void *frames, int num_frames) {
   audio_fifo_t *af = &g_audiofifo;
   audio_fifo_data_t *afd;
   size_t s;

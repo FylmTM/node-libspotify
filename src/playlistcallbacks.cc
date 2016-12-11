@@ -30,7 +30,7 @@ using namespace nsp;
  * spotify callback for the playlist_added event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlistcontainer__callbacks.html
  */
-static void call_playlist_added_callback(sp_playlistcontainer* pc, sp_playlist* spplaylist, int position, void* userdata) {
+static SP_LIBEXPORT(void) call_playlist_added_callback(sp_playlistcontainer* pc, sp_playlist* spplaylist, int position, void* userdata) {
   ObjectHandle<sp_playlistcontainer>* playlistcontainer = (ObjectHandle<sp_playlistcontainer>*) userdata;
 
   Local<Object> o = Nan::New(playlistcontainer->object);
@@ -40,16 +40,14 @@ static void call_playlist_added_callback(sp_playlistcontainer* pc, sp_playlist* 
   }
   Nan::Callback *cb = new Nan::Callback(cbv.As<Function>());
 
-  const unsigned int argc = 0;
-  Local<Value> argv[argc] = {};
-  cb->Call(argc, argv);
+  cb->Call(0, 0);
 }
 
 /**
  * spotify callback for the playlist_removed event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlistcontainer__callbacks.html
  */
-static void call_playlist_removed_callback(sp_playlistcontainer* pc, sp_playlist* playlist, int position, void* userdata) {
+static SP_LIBEXPORT(void) call_playlist_removed_callback(sp_playlistcontainer* pc, sp_playlist* playlist, int position, void* userdata) {
   ObjectHandle<sp_playlistcontainer>* playlistcontainer = (ObjectHandle<sp_playlistcontainer>*) userdata;
 
   Local<Object> o = Nan::New(playlistcontainer->object);
@@ -59,16 +57,14 @@ static void call_playlist_removed_callback(sp_playlistcontainer* pc, sp_playlist
   }
   Nan::Callback *cb = new Nan::Callback(cbv.As<Function>());
 
-  const unsigned int argc = 0;
-  Local<Value> argv[argc] = {};
-  cb->Call(argc, argv);
+  cb->Call(0, 0);
 }
 
 /**
  * spotify callback for the playlist_moved event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlistcontainer__callbacks.html
  */
-static void call_playlist_moved_callback(sp_playlistcontainer* pc, sp_playlist* playlist, int position, int new_position, void* userdata) {
+static SP_LIBEXPORT(void) call_playlist_moved_callback(sp_playlistcontainer* pc, sp_playlist* playlist, int position, int new_position, void* userdata) {
   ObjectHandle<sp_playlistcontainer>* playlistcontainer = (ObjectHandle<sp_playlistcontainer>*) userdata;
 
   Local<Object> o = Nan::New(playlistcontainer->object);
@@ -78,16 +74,14 @@ static void call_playlist_moved_callback(sp_playlistcontainer* pc, sp_playlist* 
   }
   Nan::Callback *cb = new Nan::Callback(cbv.As<Function>());
 
-  const unsigned int argc = 0;
-  Local<Value> argv[argc] = {};
-  cb->Call(argc, argv);
+  cb->Call(0, 0);
 }
 
 /**
  * spotify callback for the container loaded event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlistcontainer__callbacks.html
  */
-static void call_container_loaded_callback(sp_playlistcontainer* pc, void* userdata) {
+static SP_LIBEXPORT(void) call_container_loaded_callback(sp_playlistcontainer* pc, void* userdata) {
   ObjectHandle<sp_playlistcontainer>* playlistcontainer = (ObjectHandle<sp_playlistcontainer>*)userdata;
 
   Local<Object> o = Nan::New(playlistcontainer->object);
@@ -97,9 +91,7 @@ static void call_container_loaded_callback(sp_playlistcontainer* pc, void* userd
   }
   Nan::Callback *cb = new Nan::Callback(cbv.As<Function>());
 
-  const unsigned int argc = 0;
-  Local<Value> argv[argc] = {};
-  cb->Call(argc, argv);
+  cb->Call(0, 0);
 }
 
 static sp_playlistcontainer_callbacks nsp_playlistcontainer_callbacks = {
@@ -120,35 +112,35 @@ static sp_playlistcontainer_callbacks nsp_playlistcontainer_callbacks = {
  * spotify callback for the tracks_added event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlist__callbacks.html
  */
-static void call_tracks_added_callback(sp_playlist* pl, sp_track* const* tracks, int num_tracks, int position, void* userdata) {
+static SP_LIBEXPORT(void) call_tracks_added_callback(sp_playlist* pl, sp_track* const* tracks, int num_tracks, int position, void* userdata) {
 }
 
 /**
  * spotify callback for the tracks_removed event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlist__callbacks.html
  */
-static void call_tracks_removed_callback(sp_playlist* pl, const int* tracks, int num_tracks, void* userdata) {
+static SP_LIBEXPORT(void) call_tracks_removed_callback(sp_playlist* pl, const int* tracks, int num_tracks, void* userdata) {
 }
 
 /**
  * spotify callback for the tracks_moved event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlist__callbacks.html
  */
-static void call_tracks_moved_callback(sp_playlist* pl, const int* tracks, int num_tracks, int new_position, void* userdata) {
+static SP_LIBEXPORT(void) call_tracks_moved_callback(sp_playlist* pl, const int* tracks, int num_tracks, int new_position, void* userdata) {
 }
 
 /**
  * spotify callback for the playlist_renamed event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlist__callbacks.html
  */
-static void call_playlist_renamed_callback(sp_playlist* pl, void* userdata) {
+static SP_LIBEXPORT(void) call_playlist_renamed_callback(sp_playlist* pl, void* userdata) {
 }
 
 /**
  * spotify callback for the playlist_state_changed event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlist__callbacks.html
  */
-static void call_playlist_state_changed_callback(sp_playlist* pl, void* userdata) {
+static SP_LIBEXPORT(void) call_playlist_state_changed_callback(sp_playlist* pl, void* userdata) {
   ObjectHandle<sp_playlist>* playlist = (ObjectHandle<sp_playlist>*)userdata;
 
   Local<Object> o = Nan::New(playlist->object);
@@ -158,65 +150,63 @@ static void call_playlist_state_changed_callback(sp_playlist* pl, void* userdata
   }
   Nan::Callback *cb = new Nan::Callback(cbv.As<Function>());
 
-  const unsigned int argc = 0;
-  Local<Value> argv[argc] = {};
-  cb->Call(argc, argv);
+  cb->Call(0, 0);
 }
 
 /**
  * spotify callback for the playlist_update_in_progress event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlist__callbacks.html
  */
-static void call_playlist_update_in_progress_callback(sp_playlist* pl, bool done, void* userdata) {
+static SP_LIBEXPORT(void) call_playlist_update_in_progress_callback(sp_playlist* pl, bool done, void* userdata) {
 }
 
 /**
  * spotify callback for the playlist_metadata_updated event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlist__callbacks.html
  */
-static void call_playlist_metadata_updated_callback(sp_playlist* pl, void* userdata) {
+static SP_LIBEXPORT(void) call_playlist_metadata_updated_callback(sp_playlist* pl, void* userdata) {
 }
 
 /**
  * spotify callback for the track_created_changed event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlist__callbacks.html
  */
-static void call_track_created_changed_callback(sp_playlist* pl, int position, sp_user* user, int when, void* userdata) {
+static SP_LIBEXPORT(void) call_track_created_changed_callback(sp_playlist* pl, int position, sp_user* user, int when, void* userdata) {
 }
 
 /**
  * spotify callback for the track_seen_changed event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlist__callbacks.html
  */
-static void call_track_seen_changed_callback(sp_playlist* pl, int position, bool seen, void* userdata) {
+static SP_LIBEXPORT(void) call_track_seen_changed_callback(sp_playlist* pl, int position, bool seen, void* userdata) {
 }
 
 /**
  * spotify callback for the description_changed event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlist__callbacks.html
  */
-static void call_description_changed_callback(sp_playlist* pl, const char* desc, void* userdata) {
+static SP_LIBEXPORT(void) call_description_changed_callback(sp_playlist* pl, const char* desc, void* userdata) {
 }
 
 /**
  * spotify callback for the image_changed event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlist__callbacks.html
  */
-static void call_image_changed_callback(sp_playlist* pl, const byte* image, void* userdata) {
+static SP_LIBEXPORT(void) call_image_changed_callback(sp_playlist* pl, const byte* image, void* userdata) {
 }
 
 /**
  * spotify callback for the track_message_changed event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlist__callbacks.html
  */
-static void call_track_message_changed_callback(sp_playlist* pl, int position, const char* message, void* userdata) {
+static SP_LIBEXPORT(void) call_track_message_changed_callback(sp_playlist* pl, int position, const char* message, void* userdata) {
 }
 
 /**
  * spotify callback for the subscribers_changed event.
  * See https://developer.spotify.com/technologies/libspotify/docs/12.1.45/structsp__playlist__callbacks.html
  */
-static void call_subscribers_changed_callback(sp_playlist* pl, void* userdata) {
+static SP_LIBEXPORT(void) call_subscribers_changed_callback(sp_playlist* pl, void* userdata) {
   ObjectHandle<sp_playlist>* playlist = (ObjectHandle<sp_playlist>*)userdata;
 
   Local<Object> o = Nan::New(playlist->object);
@@ -226,9 +216,7 @@ static void call_subscribers_changed_callback(sp_playlist* pl, void* userdata) {
   }
   Nan::Callback *cb = new Nan::Callback(cbv.As<Function>());
 
-  const unsigned int argc = 0;
-  Local<Value> argv[argc] = {};
-  cb->Call(argc, argv);
+  cb->Call(0, 0);
 }
 
 static sp_playlist_callbacks nsp_playlist_callbacks = {
