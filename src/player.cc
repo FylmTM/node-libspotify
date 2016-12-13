@@ -138,6 +138,25 @@ NAN_METHOD(Session_Player_Play) {
 }
 
 /**
+ * starts playing
+ */
+NAN_METHOD(Session_Player_Seek) {
+
+
+  assert(info.Length() == 2);
+  assert(info[0]->IsObject());
+  assert(info[1]->IsNumber());
+
+  ObjectHandle<sp_session>* session = ObjectHandle<sp_session>::Unwrap(info[0]);
+  int offset = info[1]->ToNumber()->Int32Value();
+
+  sp_error error = sp_session_player_seek(session->pointer, offset);
+  NSP_THROW_IF_ERROR(error);
+
+  info.GetReturnValue().SetUndefined();
+}
+
+/**
  * async class
  */
 class NSPWorker : public Nan::AsyncWorker {
@@ -231,6 +250,7 @@ void nsp::init_player(Local<Object> target) {
   Nan::Export(target, "session_player_play", Session_Player_Play);
   Nan::Export(target, "session_player_stream_resume", Session_Player_Stream_Resume);
   Nan::Export(target, "session_player_stop", Session_Player_Stop);
+  Nan::Export(target, "session_player_seek", Session_Player_Seek);
 
   audio_fifo_t* af = &g_audiofifo;
   TAILQ_INIT(&af->q);
