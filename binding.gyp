@@ -12,7 +12,7 @@
         "src/search.cc",
         "src/session.cc",
         "src/track.cc",
-		"src/playlist.cc"
+        "src/playlist.cc"
       ],
       "include_dirs" : [ 
         "<!(node -e \"require('nan')\")"

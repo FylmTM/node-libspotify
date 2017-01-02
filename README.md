@@ -1,4 +1,12 @@
-[![Build Status](https://travis-ci.org/Floby/node-libspotify.png?branch=master)](https://travis-ci.org/Floby/node-libspotify?branch=master)
+# About this fork
+
+This is fork of [Floby/node-libspotify](https://github.com/Floby/node-libspotify).
+
+Changes:
+- Windows support
+- Build on windows uses hardcoded path
+- Build on Linux uses pkg-config
+- {TODO} OSX Build
 
 node-libspotify
 ===============
